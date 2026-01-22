@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carta c:</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #121212;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-family: 'Pinyon Script', cursive;
+            overflow: hidden; 
+        }
+
+        .envelope-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 350px;
+            cursor: pointer;
+            transition: transform 0.6s cubic-bezier(0.2, 0, 0.2, 1);
+            filter: drop-shadow(0 20px 30px rgba(0,0,0,0.6));
+        }
+
+        .envelope-wrapper:not(.open):hover {
+            transform: translateY(-5px);
+        }
+
+        .envelope-wrapper.open {
+            transform: translateY(180px);
+            cursor: default;
+        }
+
+        .texture-leather {
+            background-color: #705a42;
+            background-image: url("https://www.transparenttextures.com/patterns/black-scales.png");
+            background-blend-mode: multiply;
+        }
+
+        .envelope-back {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: #3d2e22;
+            border-radius: 5px;
+            z-index: 0;
+        }
+
+        .old-paper {
+            position: absolute;
+            bottom: 0;
+            left: 5%;
+            width: 90%;
+            height: 90%;
+            padding: 40px 50px;
+            box-sizing: border-box;
+            background-color: #e8dcc5;
+            background-image: url("https://www.transparenttextures.com/patterns/aged-paper.png");
+            box-shadow: 
+                inset 0 0 30px rgba(40, 20, 5, 0.6), 
+                inset 0 0 60px rgba(100, 70, 40, 0.3),
+                0 0 20px rgba(0,0,0,0.5);
+            border-radius: 4px;
+            z-index: 1;
+            transition: 
+                transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                height 0.8s ease, 
+                z-index 0s linear 0.4s;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .envelope-wrapper.open .old-paper {
+            z-index: 50;
+            pointer-events: auto;
+            height: 65vh; 
+            transform: translateY(-150px); 
+            box-shadow: 
+                0 25px 50px rgba(0,0,0,0.7), 
+                inset 0 0 40px rgba(60, 30, 10, 0.4);
+        }
+        
+        @media (max-width: 768px) {
+             .envelope-wrapper.open {
+                transform: translateY(150px);
+            }
+            .envelope-wrapper.open .old-paper {
+                height: 75vh;
+                transform: translateY(-200px);
+                width: 95%; left: 2.5%;
+                padding: 30px 25px;
+            }
+        }
+
+        .mold-spot {
+            position: absolute;
+            background: radial-gradient(ellipse at center, rgba(90, 60, 30, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(5px);
+            mix-blend-mode: multiply;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .envelope-pocket {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 5px;
+            z-index: 10;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.6);
+            border: 1px solid #5c4a35;
+            clip-path: polygon(0% 0%, 0% 100%, 100% 100%, 100% 0%, 50% 55%);
+            pointer-events: none;
+        }
+
+        .envelope-pocket::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom right, rgba(255,255,255,0.1), transparent 40%),
+                        linear-gradient(to top, rgba(0,0,0,0.5), transparent 30%);
+            pointer-events: none;
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 20;
+            clip-path: polygon(0% 0%, 100% 0%, 50% 56%);
+            transform-origin: top;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
+            pointer-events: none;
+        }
+
+        .flap-content {
+            width: 100%; height: 100%;
+            background-color: #786148;
+            background-image: url("https://www.transparenttextures.com/patterns/black-scales.png");
+            background-blend-mode: multiply;
+        }
+
+        .envelope-wrapper.open .envelope-flap {
+            transform: rotateX(180deg);
+            z-index: 0;
+            filter: none;
+        }
+
+        .wax-seal {
+            position: absolute;
+            top: 48%; left: 50%; transform: translate(-50%, -50%);
+            width: 70px; height: 70px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #d62828, #9e1b1b);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5), inset 0 -5px 10px rgba(50, 0, 0, 0.5);
+            border: 4px solid #7a1515;
+            z-index: 30;
+            display: flex; justify-content: center; align-items: center;
+            transition: opacity 0.3s ease;
+        }
+        .wax-seal span {
+            font-family: 'Cinzel', serif; color: #4a0d0d; font-size: 2.2rem;
+            text-shadow: 1px 1px 0 rgba(255,255,255,0.15);
+        }
+        .envelope-wrapper.open .wax-seal { opacity: 0; pointer-events: none; }
+
+        .content {
+            position: relative;
+            z-index: 2;
+            opacity: 0;
+            height: 100%;
+            color: #1f1a17;
+            line-height: 1.6;
+            transition: opacity 0.5s ease 0.4s;
+            overflow-y: auto;
+            padding-right: 5px;
+            font-size: clamp(1rem, 2vh, 1.5rem); 
+            scrollbar-width: none;
+        }
+        .content::-webkit-scrollbar { display: none; }
+        .envelope-wrapper.open .content { opacity: 1; }
+        
+        .signature { margin-top: 30px; text-align: right; font-weight: bold; font-size: 120%; }
+
+    </style>
+</head>
+<body>
+
+    <div class="envelope-wrapper" id="envelope">
+        
+        <div class="envelope-back"></div>
+
+        <div class="old-paper" id="paper">
+            <div class="content">
+                <p style="text-align: end; margin-bottom: 20px;">LM. Sin. 19/01/26</p>
+                Emma...,<br><br>
+                Te escribo esta carta simplemente para poder expresar cómo me siento. Sinceramente, después de lo ocurrido el día de mi cumpleaños, ya no sé qué hacer con todo lo que siento. Aunque no lo creas, es complicado abordar mi sentir en este momento.<br><br>
+                Claramente te amo y siento muchísimo lo que sucede entre ambos, y de verdad me pesa el estar "oculto" del mundo. Sé que estás en tu proceso, pero yo quiero sentar cabeza en un lugar donde sé que será "seguro". Ya estamos en una edad en la que, si de verdad me quisieras para eso, no nos complicaríamos la vida con este tipo de conversaciones en las cuales muy rara vez llegamos a una verdadera conclusión, más allá del solo "disculparse".<br><br>
+                A lo que me refiero es que no quiero que esto sea de un rato nada más; lo que busco contigo es algo serio. Pocas veces me comunicas de manera adecuada cómo te sientes respecto a lo que tenemos o a lo que no. Esto no es para forzarte, ya que claramente es lo que menos busco; el objetivo de todo esto es que se deje de sentir como un "juego". Mi sentir por ti excluye la lujuria, yo amo el cómo me haces sentir en la manera emocional; los besos y abrazos van cargados de amor y nada más. Quizá lo único que nos falta es más tiempo o comunicación y en verdad me interesa el saber cómo te sientes y así abordar o cambiar lo necesario.<br><br>
+                Te amo...
+                <div class="signature">D. S. N. H.</div>
+            </div>
+        </div>
+
+        <div class="envelope-pocket texture-leather"></div>
+        <div class="envelope-flap"><div class="flap-content"></div></div>
+        <div class="wax-seal"><span>D</span></div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const envelope = document.getElementById('envelope');
+            const paper = document.getElementById('paper');
+
+            const numberOfStains = 8; 
+            for (let i = 0; i < numberOfStains; i++) {
+                const stain = document.createElement('div');
+                stain.classList.add('mold-spot');
+                const size = Math.random() * 60 + 20; 
+                stain.style.width = `${size}px`;
+                stain.style.height = `${size}px`;
+                stain.style.top = `${Math.random() * 80 + 10}%`; 
+                stain.style.left = `${Math.random() * 80 + 10}%`;
+                stain.style.opacity = Math.random() * 0.3 + 0.1;
+                paper.appendChild(stain);
+            }
+
+            envelope.addEventListener('click', () => {
+                if (!envelope.classList.contains('open')) {
+                    envelope.classList.add('open');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
